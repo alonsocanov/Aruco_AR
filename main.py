@@ -3,9 +3,11 @@ import aruco_marker
 
 
 def main():
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
 
     img_aug = cv2.imread('images/display/CAHIBO.jpg')
+    aug = cv2.VideoCapture('images/display/sponge_bob.gif')
+    ret, img_aug = aug.read()
 
     while True:
         ret, frame = cap.read()
@@ -22,6 +24,7 @@ def main():
         if k == ord('q'):
             break
 
+    aug.release()
     cap.release()
     cv2.destroyAllWindows()
 
