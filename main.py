@@ -4,9 +4,14 @@ import sys
 
 
 def main():
-    cap = cv2.VideoCapture(0)
+    cap = aruco_marker.checkDevice(0)
 
     file_path = 'images/display/sponge_bob.gif'
+
+    if not aruco_marker.checkFile(file_path):
+        message = ' '.join(['File does not exist:', file_path])
+        print(message)
+        sys.exit(1)
 
     flag_img = file_path.endswith('.jpg') or file_path.endswith('.png')
     flag_vid = file_path.endswith('.gif') or file_path.endswith(

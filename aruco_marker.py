@@ -2,6 +2,7 @@ import cv2
 import cv2.aruco as aruco
 import numpy as np
 import os
+import sys
 
 
 def findArucoMarker(img, marker_size: int = 6, total_markers: int = 250, draw=True):
@@ -43,3 +44,21 @@ def augmentImage(bbox, bbox_id, img, img_aug, draw_id: bool = False):
                     cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 255), 2)
 
     return img_out
+
+
+def checkFile(file_path):
+    if os.path.isfile(file_path):
+        return True
+    return False
+
+
+def checkDevice(source, api=None):
+    if not api:
+        cap = cv2.VideoCapture(source)
+    else:
+        cap = cv2.VideoCapture(source, api)
+    if cap is None or not cap.isOpened():
+        message = ' '.join(['File does not exist:', file_path])
+        print(message)
+        sys.exit(1)
+    return cap
