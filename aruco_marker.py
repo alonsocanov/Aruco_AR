@@ -44,3 +44,23 @@ def augmentImage(bbox, bbox_id, img, img_aug, draw_id: bool = False):
                     cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 255), 2)
 
     return img_out
+
+
+def augmentCube(img, rvcs, tvecs, mtx, dst, pts):
+    for rvec, tvec in zip(rvecs, tvecs):
+        img_pts, _ = cv2.projectPoints(pts, rvec, tvec, mtx, dst)
+        img_pts = np.int32(img_pts).reshape(-1, 2)
+        img_aug = cv2.drawContours(
+            img, [img_pts[:4]], -1, (0, 0, 255), 4)
+        for i, j in zip(range(4), range(4, 8)):
+            img_aug = cv2.line(img_aug, tuple(img_pts[i]), tuple(
+                img_pts[j]), (0, 0, 255), 4)
+            img_aug = cv2.drawContours(
+                img_aug, [img_pts[4:]], -1, (0, 0, 255), 4)
+    return img_aug
+
+
+def augmentAxis(img, rvecs, tvecs, bbox, mtx, dst):
+    for rvec, tvec in zip(rvecs, tvecs):
+        cv2.aruco.drawAxis(img, mtx, dst, rvec, tvec, .5)
+        return img

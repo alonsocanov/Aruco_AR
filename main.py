@@ -66,29 +66,20 @@ def main():
                 for bbox, bbox_id in zip(aruco_found[0], aruco_found[1]):
                     frame = aruco_marker.augmentImage(
                         bbox, bbox_id, frame, img_aug, True)
-            elif args.pose:
+            else:
                 rvecs, tvecs, obj_pts = cv2.aruco.estimatePoseSingleMarkers(
                     aruco_found[0], 0.5, mtx, dst)
-                for rvec, tvec in zip(rvecs, tvecs):
-                    cv2.aruco.drawAxis(frame, mtx, dst, rvec, tvec, .5)
-            elif args.cube:
-                rvecs, tvecs, obj_pts = cv2.aruco.estimatePoseSingleMarkers(
-                    aruco_found[0], 0.5, mtx, dst)
-                markerLength = .5
-                m = markerLength/2
-                pts = np.float32([[-m, m, m], [-m, -m, m], [m, -m, m],
-                                  [m, m, m], [-m, m, 0], [-m, -m, 0],
-                                  [m, -m, 0], [m, m, 0]])
-                for rvec, tvec in zip(rvecs, tvecs):
-                    imgpts, _ = cv2.projectPoints(pts, rvec, tvec, mtx, dst)
-                    imgpts = np.int32(imgpts).reshape(-1, 2)
-                    frame = cv2.drawContours(
-                        frame, [imgpts[:4]], -1, (0, 0, 255), 4)
-                    for i, j in zip(range(4), range(4, 8)):
-                        frame = cv2.line(frame, tuple(imgpts[i]), tuple(
-                            imgpts[j]), (0, 0, 255), 4)
-                        frame = cv2.drawContours(
-                            frame, [imgpts[4:]], -1, (0, 0, 255), 4)
+                if args.pose:
+                    frame = aruco_marker.augmentAxis(
+                        frame, rvecs, tvecs, aruco_found[0], mtx, dst)
+                elif args.cube:
+                    marker_lenght = .5
+                    m = marker_lenght / 2
+                    pts = np.float32([[-m, m, m], [-m, -m, m], [m, -m, m],
+                                      [m, m, m], [-m, m, 0], [-m, -m, 0],
+                                      [m, -m, 0], [m, m, 0]])
+                    frame = aruco_marker.augmentCube(
+                        frame, rvecs, tvecs, mtx, pts)
 
         # cv2.imwrite('data/static.jpg', frame)
         cv2.imshow('Image', frame)
