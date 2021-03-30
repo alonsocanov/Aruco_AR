@@ -19,7 +19,7 @@ def main():
     parser.add_argument(
         '--mtx', type=str, default='logi_720/new_camera_matrix.txt', help='matrix path')
     parser.add_argument(
-        '--dst', type=str, default='logi_720/camera_distortion.txt.txt', help='distortion path')
+        '--dst', type=str, default='logi_720/camera_distortion.txt', help='distortion path')
     args = parser.parse_args()
 
     cap = utils.checkDevice(args.device)
@@ -83,7 +83,7 @@ def main():
                                       [m, m, m], [-m, m, 0], [-m, -m, 0],
                                       [m, -m, 0], [m, m, 0]])
                     frame = aruco_marker.augmentCube(
-                        frame, rvecs, tvecs, mtx, pts)
+                        frame, rvecs, tvecs, mtx, dst, pts)
 
         # cv2.imwrite('data/static.jpg', frame)
         cv2.imshow('Image', frame)

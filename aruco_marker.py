@@ -46,7 +46,7 @@ def augmentImage(bbox, bbox_id, img, img_aug, draw_id: bool = False):
     return img_out
 
 
-def augmentCube(img, rvcs, tvecs, mtx, dst, pts):
+def augmentCube(img, rvecs, tvecs, mtx, dst, pts):
     for rvec, tvec in zip(rvecs, tvecs):
         img_pts, _ = cv2.projectPoints(pts, rvec, tvec, mtx, dst)
         img_pts = np.int32(img_pts).reshape(-1, 2)
