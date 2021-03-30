@@ -3,6 +3,7 @@ import aruco_marker
 import utils
 import sys
 import argparse
+import numpy as np
 
 
 def main():
@@ -13,6 +14,8 @@ def main():
                         help='camera device to use')
     parser.add_argument('--pose', type=int, default=0,
                         help='pose axis')
+    parser.add_argument('--cube', type=int, default=0,
+                        help='cube')
     args = parser.parse_args()
 
     cap = utils.checkDevice(args.device)
@@ -33,7 +36,7 @@ def main():
     # size = (frame_width, frame_height)
 
     # fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-    # out = cv2.VideoWriter('data/aug_pose.avi', fourcc, 20.0, size)
+    # out = cv2.VideoWriter('data/aug_cube.avi', fourcc, 20.0, size)
 
     if not flag_img:
         for ext in vid_ext:
@@ -54,7 +57,7 @@ def main():
         ret, frame = cap.read()
         aruco_found = aruco_marker.findArucoMarker(frame)
         if len(aruco_found[0]) != 0:
-            if not args.pose:
+            if not args.pose and not args.cube:
                 if flag_vid:
                     ret, img_aug = aug.read()
                     if not ret:
@@ -68,6 +71,24 @@ def main():
                     aruco_found[0], 0.5, mtx, dst)
                 for rvec, tvec in zip(rvecs, tvecs):
                     cv2.aruco.drawAxis(frame, mtx, dst, rvec, tvec, .5)
+            elif args.cube:
+                rvecs, tvecs, obj_pts = cv2.aruco.estimatePoseSingleMarkers(
+                    aruco_found[0], 0.5, mtx, dst)
+                markerLength = .5
+                m = markerLength/2
+                pts = np.float32([[-m, m, m], [-m, -m, m], [m, -m, m],
+                                  [m, m, m], [-m, m, 0], [-m, -m, 0],
+                                  [m, -m, 0], [m, m, 0]])
+                for rvec, tvec in zip(rvecs, tvecs):
+                    imgpts, _ = cv2.projectPoints(pts, rvec, tvec, mtx, dst)
+                    imgpts = np.int32(imgpts).reshape(-1, 2)
+                    frame = cv2.drawContours(
+                        frame, [imgpts[:4]], -1, (0, 0, 255), 4)
+                    for i, j in zip(range(4), range(4, 8)):
+                        frame = cv2.line(frame, tuple(imgpts[i]), tuple(
+                            imgpts[j]), (0, 0, 255), 4)
+                        frame = cv2.drawContours(
+                            frame, [imgpts[4:]], -1, (0, 0, 255), 4)
 
         # cv2.imwrite('data/static.jpg', frame)
         cv2.imshow('Image', frame)
