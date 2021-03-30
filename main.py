@@ -13,15 +13,19 @@ def main():
     parser.add_argument('--device', type=int, default=0,
                         help='camera device to use')
     parser.add_argument('--pose', type=int, default=0,
-                        help='pose axis')
+                        help='pose axis augmentation')
     parser.add_argument('--cube', type=int, default=0,
-                        help='cube')
+                        help='cube augmentation')
+    parser.add_argument(
+        '--mtx', type=str, default='logi_720/new_camera_matrix.txt', help='matrix path')
+    parser.add_argument(
+        '--dst', type=str, default='logi_720/camera_distortion.txt.txt', help='distortion path')
     args = parser.parse_args()
 
     cap = utils.checkDevice(args.device)
 
-    mtx = utils.loadData('logi_720/new_camera_matrix.txt')
-    dst = utils.loadData('logi_720/camera_distortion.txt')
+    mtx = utils.loadData(args.mtx)
+    dst = utils.loadData(args.dst)
 
     utils.checkFile(args.path)
 
