@@ -22,9 +22,24 @@ def main():
 
     utils.checkFile(args.path)
 
+    vid_ext = ['.gif', '.mp4', '.avi', '.mov']
+
     flag_img = args.path.endswith('.jpg') or args.path.endswith('.png')
-    flag_vid = args.path.endswith('.gif') or args.path.endswith(
-        '.mov') or args.path.endswith('.mp4') or args.path.endswith('.avi')
+    flag_vid = False
+
+    # frame_width = int(cap.get(3))
+    # frame_height = int(cap.get(4))
+
+    # size = (frame_width, frame_height)
+
+    # fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    # out = cv2.VideoWriter('data/aug_pose.avi', fourcc, 20.0, size)
+
+    if not flag_img:
+        for ext in vid_ext:
+            if args.path.endswith(ext):
+                flag_vid = True
+                break
 
     if flag_img:
         img_aug = cv2.imread(args.path)
@@ -52,14 +67,16 @@ def main():
                 rvecs, tvecs, obj_pts = cv2.aruco.estimatePoseSingleMarkers(
                     aruco_found[0], 0.5, mtx, dst)
                 for rvec, tvec in zip(rvecs, tvecs):
-                    cv2.aruco.drawAxis(frame, mtx, dst, rvec, tvec, .2)
+                    cv2.aruco.drawAxis(frame, mtx, dst, rvec, tvec, .5)
 
+        # cv2.imwrite('data/static.jpg', frame)
         cv2.imshow('Image', frame)
+        # out.write(frame)
 
         k = cv2.waitKey(1) & 0xFF
         if k == ord('q'):
             break
-
+    # out.release()
     if flag_vid:
         aug.release()
     cap.release()
